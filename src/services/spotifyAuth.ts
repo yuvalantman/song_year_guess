@@ -6,11 +6,13 @@ const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || ''
 const AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize'
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token'
 const SCOPES = [
-  'streaming', // Required for Web Playback SDK
-  'user-read-private', // To read user profile
-  'user-read-email', // To read email
-  'user-read-playback-state', // Optional, to check playback state
-  'user-modify-playback-state', // Optional, to control playback
+  'streaming',
+  'playlist-read-private',
+  'playlist-read-collaborative',
+  'user-read-private',
+  'user-read-email',
+  'user-read-playback-state',
+  'user-modify-playback-state',
 ].join(' ')
 
 if (!CLIENT_ID || !REDIRECT_URI) {
@@ -47,8 +49,8 @@ export async function initiateLogin(): Promise<void> {
   const codeVerifier = generateRandomString(128)
   const codeChallenge = await generateCodeChallenge(codeVerifier)
 
-  // Store code verifier in sessionStorage (not persisted)
-  sessionStorage.setItem('spotify_code_verifier', codeVerifier)
+  // Store code verifier in localStorage (persists across redirects)
+  localStorage.setItem('spotify_code_verifier', codeVerifier)
 
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
@@ -64,7 +66,7 @@ export async function initiateLogin(): Promise<void> {
 }
 
 export async function handleCallback(code: string): Promise<string> {
-  const codeVerifier = sessionStorage.getItem('spotify_code_verifier')
+  const codeVerifier = localStorage.getItem('spotify_code_verifier')
   if (!codeVerifier) {
     throw new Error('Code verifier not found. Authorization may have been interrupted.')
   }
@@ -93,7 +95,7 @@ export async function handleCallback(code: string): Promise<string> {
   }
 
   const data = await response.json()
-  sessionStorage.removeItem('spotify_code_verifier')
+  localStorage.removeItem('spotify_code_verifier')
   return data.access_token
 }
 
