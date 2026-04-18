@@ -87,11 +87,21 @@ The app opens automatically at `http://localhost:3000`
      - **Build Command**: `npm run build` (should auto-fill)
      - **Output Directory**: `dist` (should auto-fill)
 
-3. **Add Environment Variables**
-   - In Vercel dashboard, go to Settings → Environment Variables
-   - Add: `VITE_SPOTIFY_CLIENT_ID` = your Client ID
-   - Add: `VITE_SPOTIFY_REDIRECT_URI` = `https://your-project.vercel.app/callback`
-   - Replace `your-project` with your actual Vercel project name
+3. **Add Environment Variables in Vercel Dashboard**
+   
+   Go to **Settings → Environment Variables** and add:
+   
+   **Name**: `VITE_SPOTIFY_CLIENT_ID`
+   **Value**: `abc123def456...` (your actual Client ID - just the ID, no quotes)
+   **Environments**: Check all (Production, Preview, Development)
+   **Click**: Add
+   
+   **Name**: `VITE_SPOTIFY_REDIRECT_URI`
+   **Value**: `https://YOUR_PROJECT_NAME.vercel.app/callback`
+   **Environments**: Check all (Production, Preview, Development)
+   **Click**: Add
+   
+   ⚠️ **Important**: Use plain string values, no quotes or special formatting
 
 4. **Update Spotify Redirect URI**
    - Go to https://developer.spotify.com/dashboard

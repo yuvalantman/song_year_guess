@@ -1,13 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite",
-  "env": {
-    "VITE_SPOTIFY_CLIENT_ID": {
-      "description": "Your Spotify App Client ID from https://developer.spotify.com/dashboard"
-    },
-    "VITE_SPOTIFY_REDIRECT_URI": {
-      "description": "OAuth redirect URI (e.g., https://your-project.vercel.app/callback)"
-    }
-  }
+  "framework": "vite"
 }
+

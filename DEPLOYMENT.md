@@ -99,26 +99,30 @@ Vercel auto-detects:
 
 ### Step 4: Add Environment Variables
 
-In Vercel project settings:
+⚠️ **Important**: Set these as plain STRING values in the dashboard, not in vercel.json
 
-1. Click "Settings" → "Environment Variables"
-2. Add two variables:
+In Vercel project Settings:
 
-   **Variable 1:**
+1. Go to **Settings** → **Environment Variables**
+
+2. **First Variable** - Add VITE_SPOTIFY_CLIENT_ID
    - Name: `VITE_SPOTIFY_CLIENT_ID`
-   - Value: Your actual Spotify Client ID
-   - Environments: Production, Preview, Development
+   - Value: `abc123def456...` (your actual Client ID, no quotes)
+   - Select all environments (Production, Preview, Development)
    - Click "Add"
 
-   **Variable 2:**
+3. **Second Variable** - Add VITE_SPOTIFY_REDIRECT_URI
    - Name: `VITE_SPOTIFY_REDIRECT_URI`
    - Value: `https://YOUR_VERCEL_PROJECT_NAME.vercel.app/callback`
-   - Environments: Production, Preview, Development
+   - Select all environments (Production, Preview, Development)
    - Click "Add"
 
-3. Click "Save"
+4. **Important**: Replace `YOUR_VERCEL_PROJECT_NAME` with your actual Vercel project name
+   - Example: If your Vercel URL is `https://my-spotify-game.vercel.app`
+   - Then use: `https://my-spotify-game.vercel.app/callback`
 
-Replace `YOUR_VERCEL_PROJECT_NAME` with your actual Vercel project name.
+5. All environment variables should now be visible in the list
+6. Click "Save" (if there's a button) or they auto-save
 
 ### Step 5: Update Spotify Developer App
 
