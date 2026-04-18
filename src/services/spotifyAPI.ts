@@ -23,11 +23,19 @@ async function apiCall<T>(
 
   if (!response.ok) {
     if (response.status === 401) {
-      throw new Error('Unauthorized - token may have expired')
+      throw new Error('Unauthorized - your Spotify session expired. Please log in again.')
+    }
+    if (response.status === 403) {
+      throw new Error('Forbidden - you don\'t have access to this playlist. Make sure it\'s public.')
+    }
+    if (response.status === 404) {
+      throw new Error('Playlist not found - the playlist doesn\'t exist or the ID is invalid.')
     }
     const error = await response.json().catch(() => ({}))
-    throw new Error(error.error?.message || `API error: ${response.statusText}`)
+    const errorMsg = error.error?.message || response.statusText
+    throw new Error(`${errorMsg} (${response.status})`)
   }
+
 
   return response.json()
 }
@@ -46,13 +54,19 @@ export async function getPlaylistTracks(
   offset: number = 0
 ): Promise<{ items: SpotifyTrack[]; total: number }> {
   const result = await apiCall<{
-    items: Array<{ track: SpotifyTrack }>
+    items: Array<{ track: SpotifyTrack | null }>
     total: number
   }>(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`)
 
+  if (!result || !result.items) {
+    throw new Error('Invalid playlist data received from Spotify')
+  }
+
   return {
-    items: result.items.map(item => item.track),
-    total: result.total,
+    items: result.items
+      .filter(item => item && item.track !== null)
+      .map(item => item.track as SpotifyTrack),
+    total: result.total || 0,
   }
 }
 
