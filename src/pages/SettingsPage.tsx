@@ -14,6 +14,7 @@ const PRESET_PLAYLISTS = [
   { id: '37i9dQZF1DXdbXaQcel82p', name: '2020s Hits' },
   { id: '37i9dQZF1DXcY9yKTKHJCl', name: 'Indie Gems' },
   { id: '2cWeR42ZOxYxzS1WqSNrix', name: 'shlomo' },
+  { id: '37i9dQZF1DX1okZ1ZeITst', name: 'Disney Hits' }
 ]
 
 interface Props {
