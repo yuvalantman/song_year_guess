@@ -79,10 +79,8 @@ export default function GamePage({ accessToken }: Props) {
       }
 
       setCurrentTrack(track)
+      // Play using Spotify Web API (will auto-play on device)
       await player.play(track.uri, session.mode)
-      // Auto-play after track is loaded
-      await new Promise(r => setTimeout(r, 500))
-      await player.toggle()
     } catch (err) {
       setPlayerError(err instanceof Error ? err.message : 'Playback failed')
     } finally {

@@ -8,6 +8,7 @@ import {
   setPlayerInstance,
   togglePlayback,
   restartTrack,
+  setDeviceId,
 } from '../services/spotifyPlayer'
 
 declare global {
@@ -70,6 +71,7 @@ export function useSpotifyPlayer(accessToken: string | null) {
         // Setup listeners
         player.addListener('ready', ({ device_id }: { device_id: string }) => {
           console.log('✓ Player ready with device ID:', device_id)
+          setDeviceId(device_id)
           setState(prev => ({
             ...prev,
             isReady: true,

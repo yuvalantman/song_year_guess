@@ -126,6 +126,7 @@ interface PlayerReadyEvent {
 
 // Player instance management
 let playerInstance: any = null
+let deviceId: string | null = null
 const playerReadyCallbacks: Array<(deviceId: string) => void> = []
 const playerErrorCallbacks: Array<(error: string) => void> = []
 
@@ -134,6 +135,14 @@ const playerErrorCallbacks: Array<(error: string) => void> = []
  */
 export function setPlayerInstance(player: any): void {
   playerInstance = player
+}
+
+/**
+ * Set the device ID (called from useSpotifyPlayer hook)
+ */
+export function setDeviceId(id: string): void {
+  deviceId = id
+  console.log('Device ID set:', id)
 }
 
 /**
@@ -256,35 +265,52 @@ export async function playTrack(
     throw new Error('Player not initialized. Make sure player is ready.')
   }
 
+  if (!deviceId) {
+    throw new Error('Device ID not available. Player may not be ready.')
+  }
+
   try {
-    const playOptions: PlayOptions = {
-      uris: [trackUri],
+    const { getStoredAccessToken } = await import('./spotifyAuth')
+    const token = getStoredAccessToken()
+    if (!token) {
+      throw new Error('Not authenticated')
     }
 
-    // For beginning mode, explicitly set position to 0
-    if (mode === 'beginning') {
-      playOptions.position_ms = 0
+    console.log('Playing track:', trackUri, 'on device:', deviceId)
+
+    // Use Spotify Web API to transfer playback to this device and play the track
+    const response = await fetch('https://api.spotify.com/v1/me/player/play', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        device_ids: [deviceId],
+        uris: [trackUri],
+        offset: {
+          position: 0,
+        },
+        position_ms: mode === 'beginning' ? 0 : undefined,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Playback API error: ${error}`)
     }
 
-    console.log('Playing track:', trackUri)
-    // Use play method to start the track
-    await playerInstance.play(playOptions)
+    console.log('✓ Track playing on device')
 
-    // Then use togglePlay to ensure it's playing
-    await new Promise(resolve => setTimeout(resolve, 300))
-    await playerInstance.togglePlay()
-
-    // For random sample mode, wait for playback to start then seek to random position
+    // For random sample mode, seek to random position after playback starts
     if (mode === 'random-sample') {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       try {
         const state = await playerInstance.getCurrentState()
         if (state && state.item) {
           const duration = state.item.duration_ms
-          // Seek to random position, ensuring at least 30 seconds can play
           const maxStartTime = Math.max(0, duration - 30000)
-          // Use up to 70% of track length as max start point
           const randomStart = Math.floor(Math.random() * Math.min(maxStartTime, duration * 0.7))
 
           if (randomStart > 0) {
@@ -293,7 +319,6 @@ export async function playTrack(
         }
       } catch (err) {
         console.warn('Could not seek to random position:', err)
-        // Continue anyway - playback has started
       }
     }
   } catch (error) {
