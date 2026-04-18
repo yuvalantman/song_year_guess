@@ -9,6 +9,7 @@ const SCOPES = [
   'streaming', // Required for Web Playback SDK
   'user-read-private', // To read user profile
   'user-read-email', // To read email
+  'playlist-read-public', // To read public playlists
   'user-read-playback-state', // Optional, to check playback state
   'user-modify-playback-state', // Optional, to control playback
 ].join(' ')

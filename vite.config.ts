@@ -8,8 +8,4 @@ export default defineConfig({
     port: 3000,
     open: 'http://127.0.0.1:3000',
   },
-  define: {
-    'import.meta.env.VITE_SPOTIFY_CLIENT_ID': JSON.stringify(process.env.VITE_SPOTIFY_CLIENT_ID),
-    'import.meta.env.VITE_SPOTIFY_REDIRECT_URI': JSON.stringify(process.env.VITE_SPOTIFY_REDIRECT_URI),
-  },
 })
