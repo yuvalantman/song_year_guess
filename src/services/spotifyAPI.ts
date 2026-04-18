@@ -64,25 +64,49 @@ export async function getPlaylist(playlistId: string): Promise<SpotifyPlaylist> 
   return apiCall<SpotifyPlaylist>(`/playlists/${playlistId}`)
 }
 
-export async function getAllPlaylistTracks(playlistId: string): Promise<SpotifyTrack[]> {
-  // Get the playlist which includes items in the response
-  const playlist = await apiCall<{
-    items: {
-      items: Array<{ track: SpotifyTrack | null }>
-      total: number
-    }
-  }>(`/playlists/${playlistId}`)
+export async function getPlaylistTracks(
+  playlistId: string,
+  limit: number = 50,
+  offset: number = 0
+): Promise<{ items: SpotifyTrack[]; total: number }> {
+  const response = await apiCall<{
+    items: Array<{ track: SpotifyTrack | null }>
+    total: number
+    limit: number
+    offset: number
+  }>(`/playlists/${playlistId}/items?limit=${limit}&offset=${offset}`)
 
-  // Extract tracks from the playlist items
-  if (!playlist.items || !playlist.items.items) {
-    return []
+  if (!response || !response.items) {
+    throw new Error('Invalid playlist items response from Spotify')
   }
 
-  const tracks = playlist.items.items
-    .filter(item => item && item.track !== null)
-    .map(item => item.track as SpotifyTrack)
+  return {
+    items: response.items
+      .filter(item => item && item.track !== null)
+      .map(item => item.track as SpotifyTrack),
+    total: response.total || 0,
+  }
+}
 
-  return tracks
+export async function getAllPlaylistTracks(playlistId: string): Promise<SpotifyTrack[]> {
+  const limit = 50
+  let offset = 0
+  let allTracks: SpotifyTrack[] = []
+  let hasMore = true
+
+  while (hasMore) {
+    try {
+      const { items, total } = await getPlaylistTracks(playlistId, limit, offset)
+      allTracks = allTracks.concat(items)
+      hasMore = allTracks.length < total
+      offset += limit
+    } catch (err) {
+      console.error('Error fetching playlist tracks:', err)
+      break
+    }
+  }
+
+  return allTracks
 }
 
 export function parsePlaylistId(input: string): string | null {
