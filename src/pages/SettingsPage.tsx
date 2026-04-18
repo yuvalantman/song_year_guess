@@ -13,7 +13,7 @@ const PRESET_PLAYLISTS = [
   { id: '37i9dQZF1DXcBWIGoYsMP1', name: '2010s Hits' },
   { id: '37i9dQZF1DXdbXaQcel82p', name: '2020s Hits' },
   { id: '37i9dQZF1DXcY9yKTKHJCl', name: 'Indie Gems' },
-  { id: '2cWeR42ZOxYxzS1WqSNrix?si=3ef895a9cddd408a', name: 'shlomo' },
+  { id: '2cWeR42ZOxYxzS1WqSNrix', name: 'shlomo' },
 ]
 
 interface Props {
