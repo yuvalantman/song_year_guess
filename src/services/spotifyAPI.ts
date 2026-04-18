@@ -45,7 +45,8 @@ export async function getCurrentUser(): Promise<SpotifyUser> {
 }
 
 export async function getPlaylist(playlistId: string): Promise<SpotifyPlaylist> {
-  return apiCall<SpotifyPlaylist>(`/playlists/${playlistId}`)
+  // Add market parameter - use 'US' as default, but 'IL' works for Israeli content
+  return apiCall<SpotifyPlaylist>(`/playlists/${playlistId}?market=IL`)
 }
 
 export async function getPlaylistTracks(
@@ -56,7 +57,7 @@ export async function getPlaylistTracks(
   const result = await apiCall<{
     items: Array<{ track: SpotifyTrack | null }>
     total: number
-  }>(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`)
+  }>(`/playlists/${playlistId}/tracks?market=IL&limit=${limit}&offset=${offset}`)
 
   if (!result || !result.items) {
     throw new Error('Invalid playlist data received from Spotify')
