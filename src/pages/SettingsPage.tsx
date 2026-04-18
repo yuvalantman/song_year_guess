@@ -27,7 +27,7 @@ interface Props {
 
 export default function SettingsPage({ isAuthenticated, user, error, onLogout }: Props) {
   const navigate = useNavigate()
-  const { session, startNewGame, canContinue } = useGameSession()
+  const { startNewGame, canContinue } = useGameSession()
   const [selectedPlaylist, setSelectedPlaylist] = useState<string>(PRESET_PLAYLISTS[0].id)
   const [customPlaylistInput, setCustomPlaylistInput] = useState('')
   const [gameMode, setGameMode] = useState<GameMode>('beginning')
