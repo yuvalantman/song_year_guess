@@ -80,6 +80,9 @@ export default function GamePage({ accessToken }: Props) {
 
       setCurrentTrack(track)
       await player.play(track.uri, session.mode)
+      // Auto-play after track is loaded
+      await new Promise(r => setTimeout(r, 500))
+      await player.toggle()
     } catch (err) {
       setPlayerError(err instanceof Error ? err.message : 'Playback failed')
     } finally {
@@ -169,18 +172,37 @@ export default function GamePage({ accessToken }: Props) {
           </button>
 
           {currentTrack && (
-            <button
-              className="btn-secondary btn-large"
-              onClick={() => {
-                if (session.detailsRevealed) {
-                  hideDetails()
-                } else {
-                  revealDetails()
-                }
-              }}
-            >
-              {session.detailsRevealed ? 'Hide Details' : 'Reveal Details'}
-            </button>
+            <>
+              <button
+                className="btn-secondary btn-large"
+                onClick={() => {
+                  if (session.detailsRevealed) {
+                    hideDetails()
+                  } else {
+                    revealDetails()
+                  }
+                }}
+              >
+                {session.detailsRevealed ? 'Hide Details' : 'Reveal Details'}
+              </button>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  className="btn-secondary"
+                  onClick={() => player.toggle()}
+                  style={{ flex: 1 }}
+                >
+                  {player.isPlaying ? '⏸ Pause' : '▶ Play'}
+                </button>
+                <button
+                  className="btn-secondary"
+                  onClick={() => player.restart()}
+                  style={{ flex: 1 }}
+                >
+                  🔄 Restart
+                </button>
+              </div>
+            </>
           )}
         </div>
 

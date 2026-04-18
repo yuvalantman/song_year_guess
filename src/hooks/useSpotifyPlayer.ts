@@ -6,6 +6,8 @@ import {
   resumePlayback,
   getPlaybackState,
   setPlayerInstance,
+  togglePlayback,
+  restartTrack,
 } from '../services/spotifyPlayer'
 
 declare global {
@@ -227,11 +229,41 @@ export function useSpotifyPlayer(accessToken: string | null) {
     }
   }, [])
 
+  const toggle = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, hasError: false, errorMessage: null }))
+      await togglePlayback()
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Toggle failed'
+      setState(prev => ({
+        ...prev,
+        hasError: true,
+        errorMessage: errorMsg,
+      }))
+    }
+  }, [])
+
+  const restart = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, hasError: false, errorMessage: null }))
+      await restartTrack()
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Restart failed'
+      setState(prev => ({
+        ...prev,
+        hasError: true,
+        errorMessage: errorMsg,
+      }))
+    }
+  }, [])
+
   return {
     ...state,
     play,
     pause,
     resume,
+    toggle,
+    restart,
     checkState,
   }
 }

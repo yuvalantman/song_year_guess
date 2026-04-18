@@ -266,8 +266,13 @@ export async function playTrack(
       playOptions.position_ms = 0
     }
 
-    console.log('Playing track:', trackUri, 'with options:', playOptions)
+    console.log('Playing track:', trackUri)
+    // Use play method to start the track
     await playerInstance.play(playOptions)
+
+    // Then use togglePlay to ensure it's playing
+    await new Promise(resolve => setTimeout(resolve, 300))
+    await playerInstance.togglePlay()
 
     // For random sample mode, wait for playback to start then seek to random position
     if (mode === 'random-sample') {
@@ -296,6 +301,21 @@ export async function playTrack(
     console.error('Playback error:', errorMsg)
     throw error
   }
+}
+
+export async function togglePlayback(): Promise<void> {
+  if (!playerInstance) {
+    throw new Error('Player not initialized')
+  }
+  await playerInstance.togglePlay()
+}
+
+export async function restartTrack(): Promise<void> {
+  if (!playerInstance) {
+    throw new Error('Player not initialized')
+  }
+  // Seek to beginning (0ms)
+  await playerInstance.seek(0)
 }
 
 export async function pausePlayback(): Promise<void> {
