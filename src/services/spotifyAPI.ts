@@ -70,11 +70,9 @@ export async function getPlaylistTracks(
   offset: number = 0
 ): Promise<{ items: SpotifyTrack[]; total: number }> {
   const response = await apiCall<{
-    items: Array<{ track: SpotifyTrack | null }>
+    items: Array<{ item: SpotifyTrack | null }>
     total: number
   }>(`/playlists/${playlistId}/items?limit=${limit}&offset=${offset}`)
-
-  console.log('Playlist items response:', response)
 
   if (!response || !response.items) {
     throw new Error('Invalid playlist items response from Spotify')
@@ -82,8 +80,8 @@ export async function getPlaylistTracks(
 
   return {
     items: response.items
-      .filter(item => item && item.track !== null)
-      .map(item => item.track as SpotifyTrack),
+      .filter(item => item && item.item !== null)
+      .map(item => item.item as SpotifyTrack),
     total: response.total || 0,
   }
 }
