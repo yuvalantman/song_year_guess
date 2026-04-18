@@ -69,12 +69,12 @@ export async function getPlaylistTracks(
   limit: number = 50,
   offset: number = 0
 ): Promise<{ items: SpotifyTrack[]; total: number }> {
-  // Request only the fields we need: track id, name, uri, is_playable, artists, and album with release_date
-  const fields = encodeURIComponent('items(track(id,name,uri,is_playable,artists,album(release_date))),total')
   const response = await apiCall<{
     items: Array<{ track: SpotifyTrack | null }>
     total: number
-  }>(`/playlists/${playlistId}/items?limit=${limit}&offset=${offset}&fields=${fields}`)
+  }>(`/playlists/${playlistId}/items?limit=${limit}&offset=${offset}`)
+
+  console.log('Playlist items response:', response)
 
   if (!response || !response.items) {
     throw new Error('Invalid playlist items response from Spotify')
