@@ -1,15 +1,21 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { PlayerState } from '../types'
 import {
-  initializePlayer,
   playTrack,
   pausePlayback,
   resumePlayback,
   getPlaybackState,
-  isPlayerInitialized,
-  onPlayerError,
-  removePlayerErrorListener,
+  setPlayerInstance,
 } from '../services/spotifyPlayer'
+
+declare global {
+  interface Window {
+    onSpotifyWebPlaybackSDKReady?: () => void
+    Spotify?: {
+      Player: any
+    }
+  }
+}
 
 export function useSpotifyPlayer(accessToken: string | null) {
   const [state, setState] = useState<PlayerState>({
@@ -19,43 +25,143 @@ export function useSpotifyPlayer(accessToken: string | null) {
     isPlaying: false,
     currentPosition: 0,
   })
+  const playerRef = useRef<any>(null)
 
   // Initialize player on mount and when token changes
   useEffect(() => {
-    if (!accessToken || isPlayerInitialized()) {
+    if (!accessToken) {
       return
     }
 
-    const handlePlayerError = (error: string) => {
-      setState(prev => ({
-        ...prev,
-        hasError: true,
-        errorMessage: error,
-      }))
+    // Load SDK dynamically
+    const script = document.createElement('script')
+    script.src = 'https://sdk.scdn.co/spotify-player.js'
+    script.async = true
+
+    // Set callback BEFORE appending script
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      console.log('✓ Spotify Web Playback SDK ready')
+
+      if (!window.Spotify || !window.Spotify.Player) {
+        const error = 'Spotify Player not available'
+        console.error(error)
+        setState(prev => ({
+          ...prev,
+          hasError: true,
+          errorMessage: error,
+        }))
+        return
+      }
+
+      try {
+        const player = new window.Spotify.Player({
+          name: 'Hitster Game Player',
+          getOAuthToken: (callback: (token: string) => void) => {
+            callback(accessToken)
+          },
+          volume: 0.5,
+        })
+
+        playerRef.current = player
+        setPlayerInstance(player)
+
+        // Setup listeners
+        player.addListener('ready', ({ device_id }: { device_id: string }) => {
+          console.log('✓ Player ready with device ID:', device_id)
+          setState(prev => ({
+            ...prev,
+            isReady: true,
+            hasError: false,
+            errorMessage: null,
+          }))
+        })
+
+        player.addListener('not_ready', ({ device_id }: { device_id: string }) => {
+          console.log('Device went offline:', device_id)
+          setState(prev => ({
+            ...prev,
+            isReady: false,
+          }))
+        })
+
+        player.addListener('player_state_changed', (state: any) => {
+          if (state) {
+            setState(prev => ({
+              ...prev,
+              isPlaying: state.paused === false,
+              currentPosition: state.position_ms,
+            }))
+          }
+        })
+
+        player.addListener('initialization_error', ({ message }: { message: string }) => {
+          console.error('Initialization Error:', message)
+          setState(prev => ({
+            ...prev,
+            hasError: true,
+            errorMessage: `Initialization Error: ${message}`,
+          }))
+        })
+
+        player.addListener('authentication_error', ({ message }: { message: string }) => {
+          console.error('Authentication Error:', message)
+          setState(prev => ({
+            ...prev,
+            hasError: true,
+            errorMessage: `Authentication Error: ${message}`,
+          }))
+        })
+
+        player.addListener('account_error', ({ message }: { message: string }) => {
+          console.error('Account Error:', message)
+          setState(prev => ({
+            ...prev,
+            hasError: true,
+            errorMessage: `Account Error: ${message}. Premium required.`,
+          }))
+        })
+
+        player.addListener('playback_error', ({ message }: { message: string }) => {
+          console.error('Playback Error:', message)
+          setState(prev => ({
+            ...prev,
+            hasError: true,
+            errorMessage: `Playback Error: ${message}`,
+          }))
+        })
+
+        // Connect player
+        player.connect().then((success: boolean) => {
+          if (success) {
+            console.log('✓ Connected to Spotify')
+          } else {
+            console.error('Failed to connect to Spotify')
+            setState(prev => ({
+              ...prev,
+              hasError: true,
+              errorMessage: 'Failed to connect to Spotify',
+            }))
+          }
+        })
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        console.error('Failed to create player:', errorMsg)
+        setState(prev => ({
+          ...prev,
+          hasError: true,
+          errorMessage: errorMsg,
+        }))
+      }
     }
 
-    onPlayerError(handlePlayerError)
-
-    initializePlayer(deviceId => {
-      console.log('Player ready with device ID:', deviceId)
-      setState(prev => ({
-        ...prev,
-        isReady: true,
-        hasError: false,
-        errorMessage: null,
-      }))
-    }).catch(err => {
-      const errorMsg = err instanceof Error ? err.message : String(err)
-      console.error('Failed to initialize player:', errorMsg)
-      setState(prev => ({
-        ...prev,
-        hasError: true,
-        errorMessage: errorMsg,
-      }))
-    })
+    // Append script to load SDK
+    document.body.appendChild(script)
 
     return () => {
-      removePlayerErrorListener(handlePlayerError)
+      // Cleanup
+      if (playerRef.current && typeof playerRef.current.disconnect === 'function') {
+        playerRef.current.disconnect()
+      }
     }
   }, [accessToken])
 

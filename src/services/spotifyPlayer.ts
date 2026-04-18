@@ -5,15 +5,6 @@
 
 import { getStoredAccessToken } from './spotifyAuth'
 
-declare global {
-  interface Window {
-    onSpotifyWebPlaybackSDKReady: () => void
-    Spotify: {
-      Player: new (config: SpotifyPlayerConfig) => SpotifyPlayerInstance
-    }
-  }
-}
-
 // Based on official SDK reference
 interface SpotifyPlayerConfig {
   name: string
@@ -134,9 +125,16 @@ interface PlayerReadyEvent {
 }
 
 // Player instance management
-let playerInstance: SpotifyPlayerInstance | null = null
+let playerInstance: any = null
 const playerReadyCallbacks: Array<(deviceId: string) => void> = []
 const playerErrorCallbacks: Array<(error: string) => void> = []
+
+/**
+ * Set the player instance (called from useSpotifyPlayer hook)
+ */
+export function setPlayerInstance(player: any): void {
+  playerInstance = player
+}
 
 /**
  * Initialize Spotify Web Playback SDK player
@@ -145,9 +143,15 @@ const playerErrorCallbacks: Array<(error: string) => void> = []
 export function initializePlayer(onReady?: (deviceId: string) => void): Promise<SpotifyPlayerInstance> {
   return new Promise((resolve, reject) => {
     // Check if SDK is loaded
-    if (!window.Spotify || !window.Spotify.Player) {
+    console.log('Checking Spotify SDK availability:', {
+      windowSpotify: typeof (window as any).Spotify,
+      windowSpotifyPlayer: typeof (window as any).Spotify?.Player,
+    })
+
+    if (!(window as any).Spotify || !(window as any).Spotify.Player) {
       const error = 'Spotify Web Playback SDK not loaded. Make sure it\'s included in index.html'
       console.error(error)
+      console.error('window.Spotify:', (window as any).Spotify)
       reject(new Error(error))
       return
     }
@@ -174,7 +178,7 @@ export function initializePlayer(onReady?: (deviceId: string) => void): Promise<
     }
 
     try {
-      playerInstance = new window.Spotify.Player(config)
+      playerInstance = new (window as any).Spotify.Player(config)
 
       // Setup event listeners
       // Reference: https://developer.spotify.com/documentation/web-playback-sdk/reference#events
@@ -221,7 +225,7 @@ export function initializePlayer(onReady?: (deviceId: string) => void): Promise<
       })
 
       // Connect player to Spotify
-      playerInstance.connect().then(success => {
+      playerInstance.connect().then((success: boolean) => {
         if (success) {
           console.log('✓ Connected to Spotify')
           resolve(playerInstance!)
@@ -249,7 +253,7 @@ export async function playTrack(
   mode: 'beginning' | 'random-sample' = 'beginning'
 ): Promise<void> {
   if (!playerInstance) {
-    throw new Error('Player not initialized. Call initializePlayer first.')
+    throw new Error('Player not initialized. Make sure player is ready.')
   }
 
   try {
@@ -262,6 +266,7 @@ export async function playTrack(
       playOptions.position_ms = 0
     }
 
+    console.log('Playing track:', trackUri, 'with options:', playOptions)
     await playerInstance.play(playOptions)
 
     // For random sample mode, wait for playback to start then seek to random position
