@@ -1,0 +1,403 @@
+:root {
+  --primary: #1db954;
+  --primary-dark: #1aa34a;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #282828;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-tertiary: #7f7f7f;
+  --border: #404040;
+  --danger: #e74c3c;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Typography */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* Layout */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  margin-bottom: 0.5rem;
+}
+
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-footer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: scale(1.02);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background: var(--bg-tertiary);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger);
+  color: var(--bg-primary);
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  transform: none;
+}
+
+/* Input */
+input,
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  width: 100%;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+}
+
+input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Status */
+.status {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--primary);
+  background: var(--bg-tertiary);
+  font-size: 0.95rem;
+}
+
+.status-error {
+  border-left-color: var(--danger);
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.status-warning {
+  border-left-color: #f39c12;
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.status-success {
+  border-left-color: var(--primary);
+  background: rgba(29, 185, 84, 0.1);
+}
+
+/* Forms */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.form-group small {
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+/* Song Display */
+.song-display {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+}
+
+.song-year {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.song-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.song-artist {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+}
+
+/* Large Buttons for Game Page */
+.btn-large {
+  padding: 1.5rem;
+  font-size: 1.25rem;
+  width: 100%;
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Auth Status */
+.auth-status {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--border);
+}
+
+.auth-status-item.ready {
+  border-left-color: var(--primary);
+}
+
+.auth-status-item.error {
+  border-left-color: var(--danger);
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.status-indicator.active {
+  background: var(--primary);
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.error {
+  background: var(--danger);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  html {
+    font-size: 15px;
+  }
+
+  .container {
+    padding: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .btn-large {
+    padding: 1.25rem;
+    font-size: 1.1rem;
+    min-height: 4rem;
+  }
+
+  .song-year {
+    font-size: 3rem;
+  }
+
+  .song-name {
+    font-size: 1.5rem;
+  }
+
+  .song-artist {
+    font-size: 1.1rem;
+  }
+
+  .page-footer {
+    flex-direction: column;
+  }
+
+  .page-footer button {
+    width: 100%;
+  }
+}
+
+/* Loading */
+.loading {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--text-tertiary);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
