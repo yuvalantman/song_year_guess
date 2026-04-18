@@ -12,13 +12,23 @@ async function apiCall<T>(
     throw new Error('Not authenticated')
   }
 
+  const headers: HeadersInit = {
+    Authorization: `Bearer ${token}`,
+  }
+
+  // Only add Content-Type for requests with a body (POST, PUT, PATCH)
+  if (options.body && !('Content-Type' in (options.headers || {}))) {
+    Object.assign(headers, { 'Content-Type': 'application/json' })
+  }
+
+  // Merge with any existing headers from options
+  if (options.headers) {
+    Object.assign(headers, options.headers)
+  }
+
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   })
 
   if (!response.ok) {
